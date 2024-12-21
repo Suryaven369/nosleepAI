@@ -1,28 +1,29 @@
-import { Story, StoryPrompt } from './types/story';
+import { Story, StoryPrompt } from './types/story'
+
+function generateStoryContent(prompt: string): string {
+  // For now, just return the prompt as the story
+  // In a real implementation, this would call an AI service
+  return `Here's a horror story based on your prompt:
+
+${prompt}
+
+The night grew darker as the story unfolded, and with each passing moment, the terror intensified...
+
+In the end, nothing would ever be the same again.`
+}
 
 export async function generateStory(prompt: StoryPrompt): Promise<Story> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 2000))
+
   try {
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(prompt),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to generate story');
-    }
-
-    const { story } = await response.json();
+    const generatedStory = generateStoryContent(prompt.prompt)
 
     return {
       prompt: prompt.prompt,
-      story: story,
-    };
+      story: generatedStory
+    }
   } catch (error) {
-    console.error('Story generation error:', error);
-    throw new Error('Failed to generate story. Please try again.');
+    throw new Error('Failed to generate story. Please try again.')
   }
 }
