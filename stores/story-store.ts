@@ -17,7 +17,7 @@ interface StoryState {
   clearCurrentStory: () => void
 }
 
-export const useStoryStore = create<StoryState>((set) => ({
+export const useStoryStore = create<StoryState>((set, get) => ({
   stories: [],
   currentStory: null,
   loading: false,
@@ -54,13 +54,22 @@ export const useStoryStore = create<StoryState>((set) => ({
   },
 
   removeStory: async (storyId, userId) => {
+    const { currentStory } = get()
     try {
       await deleteStory(storyId, userId)
-      set((state) => ({
-        stories: state.stories.filter(story => story.id !== storyId),
-        currentStory: state.currentStory?.id === storyId ? null : state.currentStory,
-        error: null
-      }))
+      set((state) => {
+        const newState = {
+          stories: state.stories.filter(story => story.id !== storyId),
+          error: null
+        }
+        
+        // Clear current story if it's the one being deleted
+        if (currentStory?.id === storyId) {
+          newState.currentStory = null
+        }
+        
+        return newState
+      })
     } catch (error) {
       set({ error: 'Failed to delete story' })
       throw error
