@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { SidebarHeader } from "./sidebar/header"
 import { StoryList } from "./sidebar/story-list"
-import { Story } from "@/lib/types/story"
 
 export function Sidebar() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -29,14 +28,13 @@ export function Sidebar() {
     }
   }, [user?.id, loadStories, toast])
 
-  const filteredStories = stories.filter((story: Story) => 
+  const filteredStories = stories.filter((story) => 
     story.prompt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     story.story?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleDelete = async (storyId: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!user?.id || !storyId) return
+  const handleDelete = async (storyId: string) => {
+    if (!user?.id) return
 
     try {
       await removeStory(storyId, user.id)

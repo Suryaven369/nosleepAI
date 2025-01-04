@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Story } from "@/lib/types/story"
-import { StoryItem } from "./story-item"
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Story } from '@/lib/types/story';
+import { StoryItem } from './story-item';
 
 interface StoryListProps {
-  stories: Story[]
-  isOpen: boolean
-  onSelect: (story: Story) => void
-  onDelete: (storyId: string, e: React.MouseEvent) => void
+  stories: Story[];
+  isOpen: boolean;
+  onSelect: (story: Story) => void;
+  onDelete: (storyId: string) => Promise<void>;
 }
 
 export function StoryList({ stories, isOpen, onSelect, onDelete }: StoryListProps) {
@@ -26,5 +26,5 @@ export function StoryList({ stories, isOpen, onSelect, onDelete }: StoryListProp
         ))}
       </div>
     </ScrollArea>
-  )
+  );
 }
