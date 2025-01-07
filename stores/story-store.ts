@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { Story } from '@/lib/types/story'
-import { saveStory, fetchUserStories, deleteStory } from '@/lib/db/stories'
+import { saveStory, fetchUserStories, deleteStory, updateStory } from '@/lib/db/stories'
 
 interface StoryState {
   stories: Story[]
@@ -12,6 +12,7 @@ interface StoryState {
   setCurrentStory: (story: Story) => void
   setError: (error: string | null) => void
   addStory: (story: Story, userId: string) => Promise<void>
+  updateStory: (storyId: string, userId: string, updates: Partial<Story>) => Promise<void>
   loadStories: (userId: string) => Promise<void>
   removeStory: (storyId: string, userId: string) => Promise<void>
   clearCurrentStory: () => void
@@ -43,6 +44,22 @@ export const useStoryStore = create<StoryState>((set, get) => ({
     }
   },
 
+  updateStory: async (storyId, userId, updates) => {
+    try {
+      const updatedStory = await updateStory(storyId, userId, updates)
+      set((state) => ({
+        stories: state.stories.map(story => 
+          story.id === storyId ? updatedStory : story
+        ),
+        currentStory: updatedStory,
+        error: null
+      }))
+    } catch (error) {
+      set({ error: 'Failed to update story' })
+      throw error
+    }
+  },
+
   loadStories: async (userId) => {
     try {
       const stories = await fetchUserStories(userId)
@@ -63,7 +80,6 @@ export const useStoryStore = create<StoryState>((set, get) => ({
           error: null
         }
         
-        // Clear current story if it's the one being deleted
         if (currentStory?.id === storyId) {
           newState.currentStory = null
         }
