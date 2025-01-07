@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useStoryStore } from '@/stores/story-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { StoryPrompt } from '@/lib/types/story'
-import { generateStory } from '@/lib/story-generator'
+import { StoryParameters } from '@/lib/types/story-parameters'
+import { buildStoryPrompt } from '@/lib/story/prompt-builder'
+import { validateStoryParameters } from '@/lib/story/validation'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
+import { generateStory as generateStoryAPI } from '@/lib/story-generator'
 
 export function useStoryGeneration() {
   const [loading, setLoading] = useState(false)
@@ -15,13 +17,7 @@ export function useStoryGeneration() {
   const { toast } = useToast()
   const router = useRouter()
 
-  useEffect(() => {
-    if (initialized && !user) {
-      router.push('/login')
-    }
-  }, [initialized, user, router])
-
-  const generate = async (prompt: StoryPrompt) => {
+  const generateStory = async (prompt: string, parameters: StoryParameters) => {
     if (!user?.id) {
       toast({
         variant: "destructive",
@@ -32,13 +28,30 @@ export function useStoryGeneration() {
       return
     }
 
+    const validationError = validateStoryParameters(parameters)
+    if (validationError) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Parameters",
+        description: validationError,
+      })
+      return
+    }
+
     setLoading(true)
     try {
-      const story = await generateStory(prompt)
+      const enhancedPrompt = buildStoryPrompt(prompt, parameters)
+      const story = await generateStoryAPI({
+        prompt: enhancedPrompt,
+        theme: parameters.theme,
+        length: 'medium',
+        intensity: 'moderate'
+      })
+      
       await addStory(story, user.id)
       toast({
         title: "Success",
-        description: "Your horror story has been created successfully.",
+        description: "Your story has been generated successfully.",
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to generate story'
@@ -53,5 +66,5 @@ export function useStoryGeneration() {
     }
   }
 
-  return { generateStory: generate, loading }
+  return { generateStory, loading }
 }

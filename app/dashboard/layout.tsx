@@ -1,7 +1,4 @@
-import { DashboardHeader } from "@/components/dashboard/header"
-import { Sidebar } from "@/components/dashboard/layout/sidebar"
-import { ProfileFooter } from "@/components/dashboard/layout/profile-footer"
-import { AuthCheck } from "@/components/auth/auth-check"
+import { MainNav } from "@/components/layout/main-nav"
 
 export default function DashboardLayout({
   children,
@@ -9,17 +6,11 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <AuthCheck>
-      <div className="min-h-screen bg-background">
-        <DashboardHeader />
-        <div className="flex">
-          <div className="flex flex-col">
-            <Sidebar />
-            <ProfileFooter />
-          </div>
-          {children}
-        </div>
-      </div>
-    </AuthCheck>
+    <div className="min-h-screen bg-[#0a0404]">
+      <MainNav />
+      <main className="container py-6">
+        {children}
+      </main>
+    </div>
   )
 }

@@ -3,13 +3,13 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toast'
-import { FloatingOrbs } from '@/components/ui/floating-orbs'
+import { AuthProvider } from '@/components/layout/auth-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'NoSleep Story Generator',
-  description: 'AI-powered horror story generator for r/nosleep',
+  title: 'Nightmare Ink',
+  description: 'AI-powered horror story generator',
 }
 
 export default function RootLayout({
@@ -20,9 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <FloatingOrbs />
-          {children}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Toaster />
         </ThemeProvider>
       </body>
